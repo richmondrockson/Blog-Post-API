@@ -4,11 +4,12 @@ const Post = require("../models/post");
 const authenticateToken = require("../middlewares/authMiddleware");
 
 // Create a new post
-router.post("/", async (req, res) => {
+router.post("/", authenticateToken, async (req, res) => {
   const userId = req.user.userId; // Assuming userId is set by the auth middleware
   const { title, body, author } = req.body;
   try {
     const post = await Post.create({ title, body, author, UserId: userId });
+    console.log("User from token:", req.user);
     res.status(201).json({ message: "Post created", post });
   } catch (err) {
     res
