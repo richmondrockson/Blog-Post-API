@@ -44,9 +44,10 @@ router.get("/:id", async (req, res) => {
 });
 
 // Update a post
-router.put("/:id", async (req, res) => {
+router.put("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { title, body, author } = req.body;
+  const userId = req.user.userId;
 
   try {
     const post = await Post.findByPk(id);
@@ -54,6 +55,14 @@ router.put("/:id", async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
 
+    // ❗ Only allow the user who created the post to update it
+    if (post.UserId !== userId) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to edit this post" });
+    }
+
+    // Update post fields
     post.title = title || post.title;
     post.body = body || post.body;
     post.author = author || post.author;
@@ -68,13 +77,19 @@ router.put("/:id", async (req, res) => {
 });
 
 // Delete a Post
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
+  const userId = req.user.userId;
 
   try {
     const post = await Post.findByPk(id);
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
+    }
+    if (post.UserId !== userId) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this post" });
     }
 
     await post.destroy();
