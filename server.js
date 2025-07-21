@@ -5,6 +5,7 @@ require("dotenv").config;
 const { connectDB, sequelize } = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const postRoutes = require("./routes/postRoutes");
+const commentRoutes = require("./routes/commentRoutes");
 
 // Middlewares
 app.use(express.json()); //Allows Express to automatically parse incoming JSON data
@@ -12,8 +13,8 @@ app.use(express.urlencoded({ extended: true })); //Allows Express to parse URL-e
 
 // Routes
 app.use("/api/auth", authRoutes);
-// app.use("/api/post", postRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/comments", commentRoutes);
 
 // Server
 const PORT = process.env.PORT || 5004;
