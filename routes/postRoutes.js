@@ -101,4 +101,25 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   }
 });
 
+// Get all posts by a logged-in user
+router.get("/mine", authenticateToken, async (req, res) => {
+  const userId = req.user.userId;
+
+  try {
+    const posts = await Post.findAll({
+      where: { UserId: userId },
+      order: [["createdAt", "DESC"]],
+    });
+    if (posts.length === 0) {
+      return res.status(404).json({ message: "No posts found for this user" });
+    }
+    res.json(posts);
+  } catch (err) {
+    console.error("Error fetching user's posts:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch posts", details: err.message });
+  }
+});
+
 module.exports = router;
